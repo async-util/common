@@ -1,0 +1,21 @@
+{
+  "name": "@async-util/common",
+  "version": "0.0.1",
+  "description": "Common tools of async-util",
+  "main": "index.mjs",
+  "types": "index.d.mts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/async-util/common.git"
+  },
+  "keywords": [
+    "async",
+    "util"
+  ],
+  "author": "Tal (talrasha007@gmail.com)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/async-util/common/issues"
+  },
+  "homepage": "https://github.com/async-util/common#readme"
+}
