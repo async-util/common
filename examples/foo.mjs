@@ -1,7 +1,12 @@
-import { sleep, isAsync, isGenerator, isAsyncGenerator } from '@async-util/common';
+import { sleep, isAsync, isGenerator, isAsyncGenerator, group, groupAsync } from '@async-util/common';
 
 function *gen() {}
-async function *genAsync() {}
+async function *genAsync() {
+  for (const i of [1,2,3,4,5]) {
+    yield i;
+    await sleep(500);
+  }
+}
 
 async function main() {
   console.log('isAsync(gen):', isAsync(gen));
@@ -22,6 +27,14 @@ async function main() {
   console.log('Sleeping for 1 second...');
   await sleep(1000);
   console.log('hahah');
+
+  for (const g of group([1,2,3,4,5], 3)) {
+    console.log(g)
+  }
+
+  for await (const g of groupAsync(genAsync(), 3)) {
+    console.log(g)
+  }
 }
 
 main();
