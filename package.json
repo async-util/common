@@ -1,6 +1,6 @@
 {
   "name": "@async-util/common",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Common tools of async-util",
   "main": "index.mjs",
   "types": "index.d.mts",
