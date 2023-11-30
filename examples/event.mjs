@@ -25,7 +25,7 @@ async function main() {
     console.log(data)
   }
 
-  console.log('event2 done')
+  console.log('event2 done, should not happen.')
 }
 
 main().catch(console.error)
