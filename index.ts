@@ -15,11 +15,18 @@ export function sleep(ms: number): Promise<void> {
   return new Promise(r => setTimeout(r, ms));
 }
 
-export async function *getDataFromEvent<T=any>(emitter, dataEvent='data', endEvent='end', errEvent='error') {
-  const queue: T[] = []
-  let resolve, reject, err, end = false
+interface Emitter {
+  on?: (event: string, listener: Function) => void;
+  off?: (event: string, listener: Function) => void;
+  addEventListener?: (event: string, listener: Function) => void;
+  removeEventListener?: (event: string, listener: Function) => void;
+}
 
-  const listener = (data) => {
+export async function *getDataFromEvent<T=any>(emitter: Emitter, dataEvent='data', endEvent='end', errEvent='error') {
+  const queue: T[] = []
+  let resolve: Function | null, reject: Function | null, err, end = false
+
+  const listener = (data: any) => {
     if (resolve) {
       resolve(data)
       resolve = null
@@ -36,7 +43,7 @@ export async function *getDataFromEvent<T=any>(emitter, dataEvent='data', endEve
     }
   }
 
-  const errorListener = e => {
+  const errorListener = (e: any) => {
     err = e
     if (reject) {
       reject(e)
@@ -47,9 +54,9 @@ export async function *getDataFromEvent<T=any>(emitter, dataEvent='data', endEve
   const on = emitter.on ? 'on' : 'addEventListener'
   const off = emitter.off ? 'off' : 'removeEventListener'
 
-  emitter[on](dataEvent, listener)
-  emitter[on](endEvent, endListener)
-  emitter[on](errEvent, errorListener)
+  emitter[on]!(dataEvent, listener)
+  emitter[on]!(endEvent, endListener)
+  emitter[on]!(errEvent, errorListener)
 
   try {
     while (true) {
@@ -70,9 +77,9 @@ export async function *getDataFromEvent<T=any>(emitter, dataEvent='data', endEve
       }
     }
   } finally {
-    emitter[off](dataEvent, listener)
-    emitter[off](endEvent, endListener)
-    emitter[off](errEvent, errorListener)
+    emitter[off]!(dataEvent, listener)
+    emitter[off]!(endEvent, endListener)
+    emitter[off]!(errEvent, errorListener)
   }
 }
 
