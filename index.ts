@@ -1,22 +1,22 @@
 
-export function isAsync(fn) {
+export function isAsync(fn: any) {
   return fn?.constructor?.name === 'AsyncFunction';
 }
 
-export function isGenerator(fn) {
+export function isGenerator(fn: any) {
   return fn?.constructor?.name === 'GeneratorFunction';
 }
 
-export function isAsyncGenerator(fn) {
+export function isAsyncGenerator(fn: any) {
   return fn?.constructor?.name === 'AsyncGeneratorFunction';
 }
 
-export function sleep(ms) {
+export function sleep(ms: number): Promise<void> {
   return new Promise(r => setTimeout(r, ms));
 }
 
-export async function *getDataFromEvent(emitter, dataEvent='data', endEvent='end', errEvent='error') {
-  const queue = []
+export async function *getDataFromEvent<T=any>(emitter, dataEvent='data', endEvent='end', errEvent='error') {
+  const queue: T[] = []
   let resolve, reject, err, end = false
 
   const listener = (data) => {
@@ -76,8 +76,8 @@ export async function *getDataFromEvent(emitter, dataEvent='data', endEvent='end
   }
 }
 
-export function *group(iter, n) {
-  let group = [];
+export function *group<T>(iter: Iterable<T>, n: number) {
+  let group: T[] = [];
   for (const item of iter) {
     group.push(item);
     if (group.length === n) {
@@ -91,8 +91,8 @@ export function *group(iter, n) {
   }
 }
 
-export async function *groupAsync(iter, n) {
-  let group = [];
+export async function *groupAsync<T>(iter: AsyncIterable<T>, n: number) {
+  let group: Awaited<T>[] = [];
   for await (const item of iter) {
     group.push(item);
     if (group.length === n) {
