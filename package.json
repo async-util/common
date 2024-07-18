@@ -1,9 +1,12 @@
 {
   "name": "@async-util/common",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Common tools of async-util",
-  "main": "index.mjs",
-  "types": "index.d.mts",
+  "main": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc && mv dist/index.js dist/index.mjs"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/async-util/common.git"
@@ -17,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/async-util/common/issues"
   },
-  "homepage": "https://github.com/async-util/common#readme"
+  "homepage": "https://github.com/async-util/common#readme",
+  "devDependencies": {
+    "ts-node": "^10.9.2"
+  }
 }
