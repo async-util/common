@@ -112,3 +112,26 @@ export async function *groupAsync<T>(iter: AsyncIterable<T>, n: number) {
     yield group;
   }
 }
+
+export class AsyncPool {
+  private concurrency: number;
+  private executing: Promise<any>[];
+
+  constructor(concurrency: number = 2) {
+    this.concurrency = concurrency;
+    this.executing = [];
+  }
+
+  async push(fn: () => Promise<any>) {
+    if (this.executing.length >= this.concurrency) {
+      await Promise.race(this.executing);
+    }
+
+    const p = fn().catch(console.error).finally(() => this.executing.splice(this.executing.findIndex(e => e === p), 1));
+    this.executing.push(p);
+  }
+
+  async waitAll() {
+    await Promise.all(this.executing);
+  }
+}
