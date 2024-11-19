@@ -16,70 +16,122 @@ export function sleep(ms: number): Promise<void> {
 }
 
 interface Emitter {
-  on?: (event: string, listener: Function) => void;
-  off?: (event: string, listener: Function) => void;
-  addEventListener?: (event: string, listener: Function) => void;
-  removeEventListener?: (event: string, listener: Function) => void;
+  on?: (event: string, listener: EventListenerOrEventListenerObject | null) => void;
+  off?: (event: string, listener: EventListenerOrEventListenerObject | null) => void;
+  addEventListener?: (event: string, listener: EventListenerOrEventListenerObject | null) => void;
+  removeEventListener?: (event: string, listener: EventListenerOrEventListenerObject | null) => void;
+}
+
+export async function waitForEvent(emitter: Emitter, event: string) {
+  return new Promise((resolve) => {
+    const on = emitter.on ? 'on' : 'addEventListener';
+    const off = emitter.off ? 'off' : 'removeEventListener';
+    const listener = (ev: any) => {
+      resolve(ev);
+      emitter[off]!(event, listener);
+    };
+
+    emitter[on]!(event, listener);
+  });
 }
 
 export async function *getDataFromEvent<T=any>(emitter: Emitter, dataEvent='data', endEvent='end', errEvent='error') {
-  const queue: T[] = []
-  let resolve: Function | null, reject: Function | null, err, end = false
+  const queue: T[] = [];
+  let resolve: Function | null, reject: Function | null, err, end = false;
 
   const listener = (data: any) => {
     if (resolve) {
-      resolve(data)
-      resolve = null
+      resolve(data);
+      resolve = null;
     } else {
-      queue.push(data)
+      queue.push(data);
     }
   }
 
   const endListener = () => {
-    end = true
+    end = true;
     if (resolve) {
-      resolve()
-      resolve = null
+      resolve();
+      resolve = null;
     }
   }
 
   const errorListener = (e: any) => {
-    err = e
+    err = e;
     if (reject) {
       reject(e)
-      reject = null
+      reject = null;
     } 
   }
 
-  const on = emitter.on ? 'on' : 'addEventListener'
-  const off = emitter.off ? 'off' : 'removeEventListener'
+  const on = emitter.on ? 'on' : 'addEventListener';
+  const off = emitter.off ? 'off' : 'removeEventListener';
 
-  emitter[on]!(dataEvent, listener)
-  emitter[on]!(endEvent, endListener)
-  emitter[on]!(errEvent, errorListener)
+  emitter[on]!(dataEvent, listener);
+  emitter[on]!(endEvent, endListener);
+  emitter[on]!(errEvent, errorListener);
 
   try {
     while (true) {
       if (queue.length > 0) {
-        yield queue.shift()
+        yield queue.shift();
       } else if (end) {
-        break
+        break ;
       } else if (err) {
-        throw err
+        throw err;
       } else {
         const data = await new Promise((r, j) => {
-          resolve = r
-          reject = j
+          resolve = r;
+          reject = j;
         })
 
-        if (data !== undefined) yield data
-        else break
+        if (data !== undefined) yield data;
+        else break;
       }
     }
   } finally {
-    emitter[off]!(dataEvent, listener)
-    emitter[off]!(endEvent, endListener)
-    emitter[off]!(errEvent, errorListener)
+    emitter[off]!(dataEvent, listener);
+    emitter[off]!(endEvent, endListener);
+    emitter[off]!(errEvent, errorListener);
+  }
+}
+
+export class EventDataSource {
+  private _emmiter: Emitter;
+  constructor (emmiter: Emitter) {
+    this._emmiter = emmiter;
+  }
+
+  async waitFor(eventName: string) {
+    await waitForEvent(this._emmiter, eventName);
+  }
+
+  getData(dataEvent='data', endEvent='end', errEvent='error') {
+    return getDataFromEvent(this._emmiter, dataEvent, endEvent, errEvent);
+  }
+}
+
+export class WebSocketDataSource {
+  private _ws: WebSocket;
+
+  constructor (ws: WebSocket) {
+    this._ws = ws;
+  }
+
+  async waitFor(eventName: string) {
+    await waitForEvent(this._ws as Emitter, eventName);
+  }
+
+  send(data: string | ArrayBufferLike | Blob | ArrayBufferView) {
+    this._ws.send(data);
+  }
+
+  close() {
+    this._ws.close();
+  }
+
+  getData() {
+    return getDataFromEvent(this._ws as Emitter, 'message', 'close', 'error');
   }
 }
 
