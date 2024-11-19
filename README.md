@@ -134,7 +134,7 @@ async function main() {
   setTimeout(() => ws.send('{"op":1,"d":6}'), 1000);
   setTimeout(() => ws.close(), 5000);
 
-  for await (const { data } of ws.getData('message', 'close', 'error')) {
+  for await (const { data } of ws.getData()) {
     console.log(data);
   }
 
