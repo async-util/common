@@ -118,6 +118,10 @@ export class WebSocketDataSource {
     this._ws = ws;
   }
 
+  get ws() {
+    return this._ws;
+  }
+
   async waitFor(eventName: string) {
     await waitForEvent(this._ws as Emitter, eventName);
   }
