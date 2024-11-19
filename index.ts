@@ -103,7 +103,7 @@ export class EventDataSource {
   }
 
   async waitFor(eventName: string) {
-    await waitForEvent(this._emmiter, eventName);
+    return await waitForEvent(this._emmiter, eventName);
   }
 
   getData(dataEvent='data', endEvent='end', errEvent='error') {
@@ -123,7 +123,7 @@ export class WebSocketDataSource {
   }
 
   async waitFor(eventName: string) {
-    await waitForEvent(this._ws as Emitter, eventName);
+    return await waitForEvent(this._ws as Emitter, eventName);
   }
 
   send(data: string | ArrayBufferLike | Blob | ArrayBufferView) {
