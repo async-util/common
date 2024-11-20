@@ -130,7 +130,7 @@ import { WebSocketDataSource } from '@async-util/common'
 async function main() {
   const ws = new WebSocketDataSource(new WebSocket('wss://echo.websocket.org'));
 
-  await ws.waitFor('open');
+  await ws.open();
   setTimeout(() => ws.send('{"op":1,"d":6}'), 1000);
   setTimeout(() => ws.close(), 5000);
 
