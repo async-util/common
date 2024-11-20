@@ -126,6 +126,19 @@ export class WebSocketDataSource {
     return await waitForEvent(this._ws as Emitter, eventName);
   }
 
+  async open() {
+    switch (this._ws.readyState) {
+      case WebSocket.OPEN:
+        return ;
+      case WebSocket.CLOSED:
+      case WebSocket.CLOSING:
+        throw new Error('Underlying websocket is clsoed.');
+    }
+
+    const ev: any = await Promise.race([this.waitFor('open'), this.waitFor('error')]);
+    if (ev?.type === 'error') throw ev;
+  }
+
   send(data: string | ArrayBufferLike | Blob | ArrayBufferView) {
     this._ws.send(data);
   }
