@@ -166,3 +166,22 @@ async function bar() {
   }
 }
 ```
+
+### StreamParser
+```js
+import { StreamParser } from '@async-util/common';
+
+const file = Bun.file('path/to/your/file');
+const stream = file.stream();
+const parser = new StreamParser(stream);
+
+// parse line by line
+for await (const line of parser.lines()) {
+  console.log(line);
+}
+
+// or parse as JSON objects
+for await (const obj of parser.json<YOUR_TYPE_HERE>()) {
+  console.log(obj);
+}
+```
