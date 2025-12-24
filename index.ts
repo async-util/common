@@ -204,3 +204,37 @@ export class AsyncPool {
     await Promise.all(this.executing);
   }
 }
+
+export class StreamParser {
+  private _stream: ReadableStream<Uint8Array>;
+  public lastError: any;
+  
+  constructor(readableStream: ReadableStream<Uint8Array>, private timeout = 120 * 1000) {
+    this._stream = readableStream;
+  }
+
+  cancel() {
+    return this._stream.cancel();
+  }
+
+  async *lines() {
+    const decoder = new TextDecoder();
+
+    let rest = '';
+    for await (const chunk of this._stream) {
+      const text = rest + decoder.decode(chunk);
+      const lines = text.split('\n');
+      rest = lines.pop() || '';
+
+      for (const line of lines) yield line;
+    }
+
+    if (rest) yield rest;
+  }
+
+  async *json<T = any>() {
+    for await (const line of this.lines()) {
+      if (line.trim()) yield JSON.parse(line) as T;
+    }
+  }
+}
