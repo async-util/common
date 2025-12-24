@@ -207,7 +207,6 @@ export class AsyncPool {
 
 export class StreamParser {
   private _stream: ReadableStream<Uint8Array>;
-  public lastError: any;
   
   constructor(readableStream: ReadableStream<Uint8Array>, private timeout = 120 * 1000) {
     this._stream = readableStream;
@@ -224,7 +223,11 @@ export class StreamParser {
     for await (const chunk of this._stream) {
       const text = rest + decoder.decode(chunk);
       const lines = text.split('\n');
-      rest = lines.pop() || '';
+      if (text.endsWith('\n')) {
+        rest = '';
+      } else {
+        rest = lines.pop() || '';
+      }
 
       for (const line of lines) yield line;
     }
