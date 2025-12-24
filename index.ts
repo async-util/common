@@ -208,7 +208,7 @@ export class AsyncPool {
 export class StreamParser {
   private _stream: ReadableStream<Uint8Array>;
   
-  constructor(readableStream: ReadableStream<Uint8Array>, private timeout = 120 * 1000) {
+  constructor(readableStream: ReadableStream<Uint8Array>) {
     this._stream = readableStream;
   }
 
